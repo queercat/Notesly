@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -54,14 +52,14 @@ public class AuthController : Controller
   }
 
   [HttpPost]
-  public async Task<IActionResult> Setup([FromBody] Auth auth)
+  public async Task<IActionResult> Setup([FromBody] CreateAuth auth)
   {
     if (!await _authService.ValidateAuthTableEmptyAsync())
     {
       return BadRequest();
     }
 
-    await _authService.CreateAuthAsync(auth);
+    await _authService.CreateAuthAsync(new Auth { Salt = auth.Salt, Verifier = auth.Verifier });
 
     return Ok();
   }
@@ -113,9 +111,8 @@ public class AuthController : Controller
     return Ok();
   }
 
-  // Authorize by checking for JWT in cookie.
   [HttpGet]
-  [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+  [Authorize]
   public IActionResult DebugSecret()
   {
     if (!isDevelopment())
@@ -137,6 +134,14 @@ public class AuthController : Controller
 
     return Ok();
   }
+
+  [HttpGet]
+  [Authorize]
+  public IActionResult ValidateSignedIn()
+  {
+    return Ok();
+  }
+
 
   protected Boolean isDevelopment()
   {

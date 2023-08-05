@@ -22,6 +22,22 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
   .AddJwtBearer(options =>
   {
+    // Pulls the token from the cookie.
+    options.Events = new JwtBearerEvents
+    {
+      OnMessageReceived = context =>
+      {
+        var token = context.Request.Cookies["jwt"];
+
+        if (!string.IsNullOrEmpty(token))
+        {
+          context.Token = token;
+        }
+
+        return Task.CompletedTask;
+      }
+    };
+
     options.TokenValidationParameters = new TokenValidationParameters
     {
       ValidateIssuer = false,
@@ -32,28 +48,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     };
   });
 
-builder.Services.AddAuthentication(options =>
-{
-  options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-  options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-});
-
-
 var app = builder.Build();
-
-// Handle cookie redirection middleware.
-app.Use(async (context, next) =>
-{
-  var token = context.Request.Cookies["jwt"];
-
-  if (!string.IsNullOrEmpty(token))
-  {
-    context.Request.Headers.Add("Authorization", "Bearer " + token);
-    Console.WriteLine(context.Request.Headers["Authorization"]);
-  }
-  await next();
-});
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
