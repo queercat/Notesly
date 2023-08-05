@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 
-[Keyless]
 public class Auth
 {
+  int Id { get; set; }
   public string Salt { get; set; } = "";
   public string Verifier { get; set; } = "";
 }
