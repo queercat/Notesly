@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
-[Route("api/v1/[controller]/[action]")]
+[Route("api/[controller]/[action]")]
 public class PostController : Controller
 {
   private readonly NotesDbContext _dbContext;

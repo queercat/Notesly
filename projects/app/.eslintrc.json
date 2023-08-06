@@ -6,6 +6,18 @@
     "sourceType": "module",
     "ecmaFeatures": {}
   },
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [
+          ".js",
+          ".jsx",
+          ".ts",
+          ".tsx"
+        ]
+      }
+    }
+  },
   "plugins": [
     "@typescript-eslint",
     "prettier",
@@ -29,10 +41,6 @@
       {
         "ignoreComments": true
       }
-    ],
-    "indent": [
-      "error",
-      2
     ],
     "react-hooks/rules-of-hooks": [
       "error"

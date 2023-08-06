@@ -102,13 +102,11 @@ public class AuthService
 
     var auth = await _dbContext.Auth.FirstAsync();
 
-    if (auth == null)
-    {
-      return null;
-    }
 
     var server = new SrpServer();
     var serverSession = server.DeriveSession(_serverEphemeral.Secret, _clientEphemeralPublic, auth.Salt, "", auth.Verifier, clientProof);
+
+    Console.WriteLine("Server Session Key: " + serverSession);
 
     if (serverSession.Key == null)
     {

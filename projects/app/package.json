@@ -9,7 +9,10 @@
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "download-swagger": "curl http://localhost:5036/swagger/v1/swagger.json -o src/api/swagger.json",
+    "generate-api": "openapi --input src/api/swagger.json --output src/api/ -c fetch",
+    "swagger-gen": "yarn run download-swagger && yarn run generate-api"
   },
   "dependencies": {
     "@emotion/react": "^11.10.8",
@@ -18,7 +21,8 @@
     "@mui/material": "^5.12.3",
     "framer-motion": "^10.12.12",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.14.2"
   },
   "devDependencies": {
     "@storybook/addon-essentials": "7.0.9",
@@ -44,7 +48,9 @@
     "eslint-plugin-unused-imports": "^2.0.0",
     "prettier": "^2.8.8",
     "prop-types": "15.8.1",
+    "secure-remote-password": "^0.3.1",
     "storybook": "7.0.9",
+    "swagger-typescript-api": "^13.0.2",
     "typescript": "^5.0.2",
     "vite": "^4.3.2"
   }

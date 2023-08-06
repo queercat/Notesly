@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-[Route("api/v1/[controller]/[action]")]
+[Route("api/[controller]/[action]")]
 [ApiController]
 public class AuthController : Controller
 {
@@ -15,22 +15,17 @@ public class AuthController : Controller
   }
 
   [HttpPost]
-  public async Task<ActionResult> Start([FromBody] string clientEphemeralPublic)
+  public async Task<ActionResult> Start([FromBody] StartAuthRequest startAuthRequest)
   {
+    var clientEphemeralPublic = startAuthRequest.ClientEphemeralPublic;
     // Validate that the auth table isn't empty.
     if (await _authService.ValidateAuthTableEmptyAsync())
     {
       return BadRequest("You need to complete setup.");
     }
 
-    // Validate that the client's ephemeral does not exist and that the input is "valid".
-    if (_authService.ValidateEphermeralExists() || string.IsNullOrEmpty(clientEphemeralPublic))
-    {
-      return BadRequest();
-    }
-
     // Generate the server ephemeral.
-    var result = _authService.GenerateEphemeralAsync(clientEphemeralPublic);
+    var result = await _authService.GenerateEphemeralAsync(clientEphemeralPublic);
 
     if (result == null)
     {
@@ -41,14 +36,34 @@ public class AuthController : Controller
   }
 
   [HttpPost]
-  public ActionResult Complete([FromBody] Auth auth)
+  public async Task<ActionResult> Complete([FromBody] CompleteAuthRequest completeAuthRequest)
   {
-    if (!_authService.ValidateEphermeralExists())
+    var clientProof = completeAuthRequest.ClientProof;
+    var result = await _authService.GenerateProof(clientProof);
+
+    if (result == null)
     {
       return BadRequest();
     }
 
-    return Ok();
+    var jwtToken = _authService.GenerateJwtToken();
+
+    if (string.IsNullOrEmpty(jwtToken))
+    {
+      return BadRequest();
+    }
+
+    var cookie = new CookieOptions
+    {
+      HttpOnly = true,
+      Secure = true,
+      SameSite = SameSiteMode.Strict,
+      Expires = DateTime.UtcNow.AddHours(1)
+    };
+
+    Response.Cookies.Append("jwt", jwtToken, cookie);
+
+    return new OkObjectResult(result);
   }
 
   [HttpPost]
@@ -75,6 +90,17 @@ public class AuthController : Controller
     var result = await _authService.DeleteAuthAsync();
 
     return result ? Ok() : BadRequest();
+  }
+
+  [HttpGet]
+  public IActionResult DebugTest()
+  {
+    if (!isDevelopment())
+    {
+      return BadRequest();
+    }
+
+    return Ok();
   }
 
   [HttpGet]
@@ -112,6 +138,12 @@ public class AuthController : Controller
   }
 
   [HttpGet]
+  public async Task<Boolean> VerifyHasSetup()
+  {
+    return await _authService.ValidateAuthTableEmptyAsync() == false;
+  }
+
+  [HttpGet]
   [Authorize]
   public IActionResult DebugSecret()
   {
@@ -137,7 +169,7 @@ public class AuthController : Controller
 
   [HttpGet]
   [Authorize]
-  public IActionResult ValidateSignedIn()
+  public IActionResult Verify()
   {
     return Ok();
   }

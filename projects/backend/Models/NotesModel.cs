@@ -1,10 +1,13 @@
 using Microsoft.EntityFrameworkCore;
+using SecureRemotePassword;
 
 public class Auth
 {
   public int Id { get; set; }
   public string Salt { get; set; } = "";
   public string Verifier { get; set; } = "";
+  public string? ServerEphemeralPublic { get; set; } = "";
+  public string? ServerEphemeralSecret { get; set; } = "";
 }
 
 public class CreateAuth
