@@ -9,11 +9,11 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { isAuthorized, isLoading } = useIsAuthorized()
 
   if (isLoading) {
-    return <div>Loading...</div>
+    return <></>
   }
 
   if (!isAuthorized) {
-    return <Navigate to={"/login"} />
+    return <Navigate to={"/login"} replace={true} />
   }
 
   return <>{children}</>

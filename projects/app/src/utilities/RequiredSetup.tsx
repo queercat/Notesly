@@ -16,7 +16,7 @@ export const RequiredSetup: React.FC<RequiredSetupProps> = ({
   const { isSetup, isLoading } = useIsSetup()
 
   if (isLoading) {
-    return <div>Loading...</div>
+    return <></>
   }
 
   if (!redirectSetupState ? !isSetup : redirectSetupState == isSetup) {

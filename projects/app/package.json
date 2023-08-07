@@ -22,7 +22,8 @@
     "framer-motion": "^10.12.12",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.14.2"
+    "react-router-dom": "^6.14.2",
+    "secure-remote-password": "https://github.com/LinusU/secure-remote-password.git#rfc5054"
   },
   "devDependencies": {
     "@storybook/addon-essentials": "7.0.9",
@@ -48,7 +49,6 @@
     "eslint-plugin-unused-imports": "^2.0.0",
     "prettier": "^2.8.8",
     "prop-types": "15.8.1",
-    "secure-remote-password": "^0.3.1",
     "storybook": "7.0.9",
     "swagger-typescript-api": "^13.0.2",
     "typescript": "^5.0.2",

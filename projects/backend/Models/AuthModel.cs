@@ -1,6 +1,6 @@
 public class StartAuthRequest
 {
-  public string ClientEphemeralPublic { get; set; } = null!;
+  public string ClientPublicEphemeral { get; set; } = null!;
 }
 
 public class CompleteAuthRequest

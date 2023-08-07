@@ -8,18 +8,8 @@ using SecureRemotePassword;
 public class AuthService
 {
   private readonly NotesDbContext _dbContext;
-  private SrpEphemeral? _serverEphemeral;
-  private string? _clientEphemeralPublic;
-
-  // There is an issue with this code.
-  // If two users were to send a authroization request at the same time,
-  // There is probability that the secret will be overwritten.
-  // The basic solution is to tie session management to a cookie.
-  // And then use a dictionary to store the secret.
-  // If this project ever grows to the point where it needs to handle
-  // many simultaneous requests, then this code will need to be updated.
-
   private readonly IConfiguration _configuration;
+  private readonly SrpServer _srpServer = new();
 
   public AuthService(
     NotesDbContext dbContext,
@@ -28,11 +18,6 @@ public class AuthService
   {
     _dbContext = dbContext;
     _configuration = configuration;
-  }
-
-  public Boolean ValidateEphermeralExists()
-  {
-    return !string.IsNullOrEmpty(_clientEphemeralPublic);
   }
 
   public async Task<Auth> CreateAuthAsync(Auth auth)
@@ -68,52 +53,44 @@ public class AuthService
     return await _dbContext.Auth.AnyAsync() == false;
   }
 
-
-  public async Task<object> GenerateEphemeralAsync(string clientEphemeralPublic)
+  public async Task<object> GenerateEphemeralAsync(string clientPublicEphemeral)
   {
-    var auth = await _dbContext.Auth.FirstAsync();
-
-    if (auth == null)
-    {
-      throw new Exception("Auth not found");
-    }
-
-    _clientEphemeralPublic = clientEphemeralPublic;
+    var auth = await _dbContext.Auth.FirstAsync() ?? throw new Exception("Auth not found");
 
     var verifier = auth.Verifier;
     var salt = auth.Salt;
 
-    var server = new SrpServer();
-    _serverEphemeral = server.GenerateEphemeral(verifier);
+    var serverEphemeral = _srpServer.GenerateEphemeral(verifier);
+
+    auth.ServerEphemeralPublic = serverEphemeral.Public;
+    auth.ServerEphemeralSecret = serverEphemeral.Secret;
+    auth.ClientEphemeralPublic = clientPublicEphemeral;
+
+    await _dbContext.SaveChangesAsync();
 
     return new
     {
-      serverEphemeralPublic = _serverEphemeral.Public,
-      salt = salt
+      serverEphemeralPublic = serverEphemeral.Public,
+      salt
     };
   }
 
   public async Task<string?> GenerateProof(string clientProof)
   {
-    if (_serverEphemeral == null)
+    var auth = await _dbContext.Auth.FirstAsync() ?? throw new Exception("Auth not found");
+
+    var serverEphemeralSecret = auth.ServerEphemeralSecret;
+    var clientPublicEphemeral = auth.ClientEphemeralPublic;
+
+    try
+    {
+      var serverSession = _srpServer.DeriveSession(serverEphemeralSecret, clientPublicEphemeral, auth.Salt, "", auth.Verifier, clientProof);
+      return serverSession.Proof;
+    }
+    catch (Exception)
     {
       return null;
     }
-
-    var auth = await _dbContext.Auth.FirstAsync();
-
-
-    var server = new SrpServer();
-    var serverSession = server.DeriveSession(_serverEphemeral.Secret, _clientEphemeralPublic, auth.Salt, "", auth.Verifier, clientProof);
-
-    Console.WriteLine("Server Session Key: " + serverSession);
-
-    if (serverSession.Key == null)
-    {
-      return null;
-    }
-
-    return serverSession.Proof;
   }
 
   public string GenerateJwtToken()
@@ -137,5 +114,21 @@ public class AuthService
 
     var token = tokenHandler.CreateToken(tokenDescriptor);
     return tokenHandler.WriteToken(token);
+  }
+
+  public void EvictEphemeral()
+  {
+    var auth = _dbContext.Auth.FirstOrDefault();
+
+    if (auth == null)
+    {
+      return;
+    }
+
+    auth.ServerEphemeralPublic = null;
+    auth.ServerEphemeralSecret = null;
+    auth.ClientEphemeralPublic = null;
+
+    _dbContext.SaveChanges();
   }
 }

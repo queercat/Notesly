@@ -1,6 +1,5 @@
 import { Alert, Box } from "@mui/material"
 import React from "react"
-import { redirect } from "react-router-dom"
 import srp from "secure-remote-password/client"
 
 import { AlertSection } from "../components/Alert/AlertSection"
@@ -22,19 +21,17 @@ export const SetupPage: React.FC<SetupPageProps> = () => {
   const { mutate, result } = useSetup()
 
   const handleSubmit = async () => {
-    try {
-      const salt = srp.generateSalt()
-      const privateKey = srp.derivePrivateKey(key, "", salt)
-      const verifier = srp.deriveVerifier(privateKey)
+    const username = ""
+    const password = key
 
-      await mutate(salt, verifier)
+    const salt = srp.generateSalt()
+    const privateKey = srp.derivePrivateKey(salt, username, password)
 
-      if (result) {
-        redirect("/login")
-      }
-    } catch (error) {
-      console.error(error)
-    }
+    const verifier = srp.deriveVerifier(privateKey)
+
+    await mutate(salt, verifier)
+
+    console.log(result)
   }
 
   React.useEffect(() => {

@@ -18,9 +18,14 @@ interface EndpointGroup {
   endpoints: Record<string, Endpoint>
 }
 
+const Ports = {
+  Debug: 7287,
+  Development: 5036,
+}
+
 // Define the AuthEndpoints constant
 export const AuthEndpoints = {
-  prefix: "http://localhost:5036/api/auth",
+  prefix: `http://localhost:${Ports.Development}/api/auth`,
   endpoints: {
     Login: {
       url: "/login",

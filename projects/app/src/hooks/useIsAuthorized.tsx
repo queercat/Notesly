@@ -10,7 +10,11 @@ export const useIsAuthorized = () => {
     const validateAuthorization = async () => {
       try {
         const result = await fetch(
-          AuthEndpoints.prefix + AuthEndpoints.endpoints.Verify.url
+          AuthEndpoints.prefix + AuthEndpoints.endpoints.Verify.url,
+          {
+            method: "GET",
+            credentials: "include",
+          }
         )
 
         result.status === 200 ? setIsAuthorized(true) : setIsAuthorized(false)

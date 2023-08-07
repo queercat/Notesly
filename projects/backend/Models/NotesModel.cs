@@ -8,6 +8,7 @@ public class Auth
   public string Verifier { get; set; } = "";
   public string? ServerEphemeralPublic { get; set; } = "";
   public string? ServerEphemeralSecret { get; set; } = "";
+  public string? ClientEphemeralPublic { get; set; } = "";
 }
 
 public class CreateAuth

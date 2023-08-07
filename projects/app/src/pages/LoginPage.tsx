@@ -1,42 +1,69 @@
 import { Alert, Box } from "@mui/material"
 import React from "react"
+import { useNavigate } from "react-router-dom"
 import srp from "secure-remote-password/client"
 
 import { AlertSection } from "../components/Alert/AlertSection"
 import { CurvedButton } from "../components/Button/CurvedButton"
 import { CurvedInput } from "../components/TextInput/CurvedInput"
+import { useIsAuthorized } from "../hooks/useIsAuthorized"
 import { useSrpAuthorization } from "../hooks/useSrpAuthorization"
 import { AuthContainer } from "./AuthContainer"
 
 interface LoginPageProps {}
 
 export const LoginPage: React.FC<LoginPageProps> = ({ ...props }) => {
+  const { isAuthorized, isLoading } = useIsAuthorized()
   const [key, setKey] = React.useState("")
   const [errorText, setErrorText] = React.useState("")
-  const { startMutate, completeMutate, validate, result } =
-    useSrpAuthorization()
+  const { startMutate, completeMutate } = useSrpAuthorization()
+  const navigate = useNavigate()
 
   const handleSubmit = async () => {
+    const username = ""
     const clientEphemeral = srp.generateEphemeral()
 
-    let result = await startMutate(clientEphemeral.public)
+    const { serverEphemeralPublic, salt } = await startMutate(
+      clientEphemeral.public
+    )
 
-    const { serverEphemeralPublic, salt } = result
-
-    if (!serverEphemeralPublic || !salt) {
-      setErrorText("Something went wrong.")
-      return
-    }
+    const password = key
+    const privateKey = srp.derivePrivateKey(salt, username, password)
 
     const clientSession = srp.deriveSession(
       clientEphemeral.secret,
       serverEphemeralPublic,
       salt,
-      "",
-      key
+      username,
+      privateKey
     )
 
-    result = await completeMutate(clientSession.proof)
+    const proof = await completeMutate(clientSession.proof)
+
+    if (proof.status !== 200) {
+      setErrorText("Invalid key.")
+      return
+    }
+
+    setErrorText("")
+    const { result } = await proof.json()
+
+    try {
+      srp.verifySession(clientEphemeral.public, clientSession, result)
+    } catch (error) {
+      setErrorText("Invalid key.")
+      return
+    }
+
+    navigate("/")
+  }
+
+  if (isLoading) {
+    return <></>
+  }
+
+  if (isAuthorized) {
+    navigate("/")
   }
 
   return (

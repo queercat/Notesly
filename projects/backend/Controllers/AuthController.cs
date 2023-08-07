@@ -17,7 +17,7 @@ public class AuthController : Controller
   [HttpPost]
   public async Task<ActionResult> Start([FromBody] StartAuthRequest startAuthRequest)
   {
-    var clientEphemeralPublic = startAuthRequest.ClientEphemeralPublic;
+    var clientEphemeralPublic = startAuthRequest.ClientPublicEphemeral;
     // Validate that the auth table isn't empty.
     if (await _authService.ValidateAuthTableEmptyAsync())
     {
@@ -41,17 +41,14 @@ public class AuthController : Controller
     var clientProof = completeAuthRequest.ClientProof;
     var result = await _authService.GenerateProof(clientProof);
 
+    _authService.EvictEphemeral();
+
     if (result == null)
     {
-      return BadRequest();
+      return Unauthorized();
     }
 
     var jwtToken = _authService.GenerateJwtToken();
-
-    if (string.IsNullOrEmpty(jwtToken))
-    {
-      return BadRequest();
-    }
 
     var cookie = new CookieOptions
     {
@@ -63,7 +60,7 @@ public class AuthController : Controller
 
     Response.Cookies.Append("jwt", jwtToken, cookie);
 
-    return new OkObjectResult(result);
+    return new OkObjectResult(new { result });
   }
 
   [HttpPost]
@@ -173,7 +170,6 @@ public class AuthController : Controller
   {
     return Ok();
   }
-
 
   protected Boolean isDevelopment()
   {
