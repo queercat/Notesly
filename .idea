@@ -1,0 +1,1 @@
+Create a session component that wraps around session storage and sets and updates the React context.

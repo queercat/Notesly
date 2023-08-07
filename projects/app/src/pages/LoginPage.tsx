@@ -51,6 +51,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ ...props }) => {
     try {
       srp.verifySession(clientEphemeral.public, clientSession, result)
     } catch (error) {
+      console.log(error)
       setErrorText("Invalid key.")
       return
     }

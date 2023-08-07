@@ -11,13 +11,14 @@ export const useSrpAuthorization = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          clientEphemeralPublic: publicClientEphemeral,
+          clientPublicEphemeral: publicClientEphemeral,
         }),
       }
     )
 
     return await res.json()
   }
+
   const completeMutate = async (proof: string) => {
     const res = await fetch(
       AuthEndpoints.prefix + AuthEndpoints.endpoints.SrpComplete.url,
@@ -33,9 +34,8 @@ export const useSrpAuthorization = () => {
       }
     )
 
-    return await res.json()
+    return res
   }
-  const validate = () => {}
 
-  return { startMutate, completeMutate, validate }
+  return { startMutate, completeMutate }
 }

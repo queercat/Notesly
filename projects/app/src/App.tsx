@@ -1,4 +1,4 @@
-import React from "react"
+import React, { createContext } from "react"
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
 
 import { HomePage } from "./pages/HomePage"
@@ -34,8 +34,20 @@ const router = createBrowserRouter([
   },
 ])
 
-interface AppProps {}
+export const EncryptionKeyContext = createContext({
+  encryptionKey: "",
+  // eslint-disable-next-line no-unused-vars
+  setEncryptionKey: (_key: string) => {},
+})
 
-export const App: React.FC<AppProps> = () => {
-  return <RouterProvider router={router} />
+export const App: React.FC = () => {
+  const [encryptionKey, setEncryptionKey] = React.useState("")
+
+  const value = { encryptionKey, setEncryptionKey }
+
+  return (
+    <EncryptionKeyContext.Provider value={value}>
+      <RouterProvider router={router} />
+    </EncryptionKeyContext.Provider>
+  )
 }
