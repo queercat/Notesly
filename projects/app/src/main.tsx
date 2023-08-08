@@ -11,8 +11,6 @@ import { theme } from "./themes/theme.ts"
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <ThemeProvider theme={theme}>
     <CssBaseline />
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>
+    <App />
   </ThemeProvider>
 )

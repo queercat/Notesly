@@ -2891,6 +2891,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/crypto-js@^4.1.1":
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/@types/crypto-js/-/crypto-js-4.1.1.tgz#602859584cecc91894eb23a4892f38cfa927890d"
+  integrity sha512-BG7fQKZ689HIoc5h+6D2Dgq1fABRa0RbBWKBd9SP/MVRVXROflpm5fhwyATX5duFmbStzyzyycPB8qUYKDH3NA==
+
 "@types/detect-port@^1.3.0":
   version "1.3.3"
   resolved "https://registry.yarnpkg.com/@types/detect-port/-/detect-port-1.3.3.tgz#124c5d4c283f48a21f80826bcf39433b3e64aa81"
@@ -4130,6 +4135,11 @@ crypto-digest-sync@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/crypto-digest-sync/-/crypto-digest-sync-1.0.0.tgz#7dcdb12a54c19af8d138eb5f533f3c4c6bb4c0ed"
   integrity sha512-UQBOB5z+HF4iA8shKQ3PPwhCmdFAihwcytD1Qh4uiz78x04cZZmKtZ1F1VyAjkrA8uEZqXt2tMXfj3dJHtcbng==
+
+crypto-js@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/crypto-js/-/crypto-js-4.1.1.tgz#9e485bcf03521041bd85844786b83fb7619736cf"
+  integrity sha512-o2JlM7ydqd3Qk9CA0L4NL6mTzU2sdx96a+oOfPu8Mkl/PK51vSyoi8/rQ8NknZtk44vq15lmhAj9CIAGwgeWKw==
 
 crypto-random-hex@^1.0.0:
   version "1.0.0"
@@ -6015,11 +6025,6 @@ jest-worker@^29.6.2:
     jest-util "^29.6.2"
     merge-stream "^2.0.0"
     supports-color "^8.0.0"
-
-js-srp@^0.0.2:
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/js-srp/-/js-srp-0.0.2.tgz#dfcba7f0077f3f485a26a17906d7b77a213395a1"
-  integrity sha512-emUG0tNbVmyqw1/lVOfnPC/Kc4ko4FRlINQ6QPf7oKc4gS1Dp/aVXjrCnL1a1sqRMWSYsPlFX8GFlGhveFv23A==
 
 "js-tokens@^3.0.0 || ^4.0.0", js-tokens@^4.0.0:
   version "4.0.0"

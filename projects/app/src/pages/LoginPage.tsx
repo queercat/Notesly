@@ -1,4 +1,5 @@
 import { Alert, Box } from "@mui/material"
+import * as cryptojs from "crypto-js"
 import React from "react"
 import { useNavigate } from "react-router-dom"
 import srp from "secure-remote-password/client"
@@ -6,17 +7,23 @@ import srp from "secure-remote-password/client"
 import { AlertSection } from "../components/Alert/AlertSection"
 import { CurvedButton } from "../components/Button/CurvedButton"
 import { CurvedInput } from "../components/TextInput/CurvedInput"
+import { EncryptionKeyContext } from "../contexts/EncryptionKeyContext"
 import { useIsAuthorized } from "../hooks/useIsAuthorized"
+import { useSessionStorageManager } from "../hooks/useSessionStorageManager"
 import { useSrpAuthorization } from "../hooks/useSrpAuthorization"
 import { AuthContainer } from "./AuthContainer"
 
-interface LoginPageProps {}
-
-export const LoginPage: React.FC<LoginPageProps> = ({ ...props }) => {
+export const LoginPage: React.FC = ({ ...props }) => {
   const { isAuthorized, isLoading } = useIsAuthorized()
+  const { startMutate, completeMutate } = useSrpAuthorization()
+  const { setKey: setEncryptionKey } = useSessionStorageManager(
+    EncryptionKeyContext,
+    "EncryptionKey"
+  )
+
   const [key, setKey] = React.useState("")
   const [errorText, setErrorText] = React.useState("")
-  const { startMutate, completeMutate } = useSrpAuthorization()
+
   const navigate = useNavigate()
 
   const handleSubmit = async () => {
@@ -55,6 +62,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({ ...props }) => {
       setErrorText("Invalid key.")
       return
     }
+
+    const derivedKey = cryptojs.PBKDF2(password, salt).toString()
+
+    setEncryptionKey(derivedKey)
 
     navigate("/")
   }

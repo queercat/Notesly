@@ -1,17 +1,19 @@
-import React, { useContext, useEffect } from "react"
+import React from "react"
 
-import { EncryptionKeyContext } from "../App"
+import { useEncryption } from "../hooks/useEncryption"
 
-interface HomePageProps {}
+export const HomePage: React.FC = () => {
+  const { encrypt, decrypt } = useEncryption()
 
-export const HomePage: React.FC<HomePageProps> = ({ ...props }) => {
-  const { encryptionKey, setEncryptionKey } = useContext(EncryptionKeyContext)
+  const encryptedText = encrypt("Hello World")
 
-  useEffect(() => {
-    setTimeout(() => {
-      setEncryptionKey("test")
-    }, 1000)
-  }, [setEncryptionKey])
-
-  return <div {...props}>key: {encryptionKey}</div>
+  return (
+    <>
+      <div>Encrypted Text:{encryptedText}</div>
+      <div>
+        Decrypted Text:
+        {decrypt(encryptedText)}
+      </div>
+    </>
+  )
 }

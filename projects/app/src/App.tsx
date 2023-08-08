@@ -1,6 +1,7 @@
-import React, { createContext } from "react"
+import React from "react"
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
 
+import { EncryptionKeyContext } from "./contexts/EncryptionKeyContext"
 import { HomePage } from "./pages/HomePage"
 import { LoginPage } from "./pages/LoginPage"
 import { SetupPage } from "./pages/SetupPage"
@@ -34,16 +35,9 @@ const router = createBrowserRouter([
   },
 ])
 
-export const EncryptionKeyContext = createContext({
-  encryptionKey: "",
-  // eslint-disable-next-line no-unused-vars
-  setEncryptionKey: (_key: string) => {},
-})
-
 export const App: React.FC = () => {
-  const [encryptionKey, setEncryptionKey] = React.useState("")
-
-  const value = { encryptionKey, setEncryptionKey }
+  const [key, setKey] = React.useState("")
+  const value = React.useMemo(() => ({ key, setKey }), [key, setKey])
 
   return (
     <EncryptionKeyContext.Provider value={value}>
